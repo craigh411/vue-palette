@@ -1,5 +1,5 @@
 <template>
-    <div ref="sliderContainer" tabindex="0" class="slider-container" @mousemove="changeColor" @click="changeColor" @mousedown="dragging = true" @mouseover="focus(true)" @mouseout="focus(false)" @keydown="moveSlider">
+    <div ref="sliderContainer" tabindex="0" class="slider-container" @click="changeColor" @mousedown="dragging = true" @mouseover="focus(true)" @mouseout="focus(false)" @keydown="moveSlider">
         <canvas ref="slider" height="150" width="30"></canvas>
         <div class="pointer" :style="{top: pointerPosition}" @mousedown="dragging = true"></div>
     </div>
@@ -17,24 +17,13 @@ export default {
         }
     },
     created() {
-        if(this.isHex(this.startColor)){
-          this.color = this.hexToRgb(this.startColor);
-        }else{
-          this.color =  this.startColor;          
-        }
-
-
+        this.setColor(this.startColor);
     },
     mounted() {
         this.top = this.$refs.sliderContainer.getBoundingClientRect().top;
-        document.addEventListener('mouseup', () => {
-            this.dragging = false;
-        });
         document.addEventListener('mousemove', e => {
             if (this.dragging) {
-                if (e.clientY < this.top) {
-                    this.setPointerPosition(0)
-                }
+                this.changeColor(e);
             }
         });
         this.build();
@@ -84,7 +73,20 @@ export default {
     },
     watch: {
         color() {
-            this.$emit('color-selected', this.color, this.hex, this.rgbValues);
+            if (this.color) {
+                this.$emit('color-selected', this.color, this.hex, this.rgbValues, this.auto);
+                this.auto = false;
+            }
+        },
+        startColor(val) {
+            if (val) {
+                this.setColor(val);
+                let coords = this.findColor(this.rgbValues, 1, 1, 0, 149);
+                this.setPointerPosition(coords.y);
+                this.auto = true;
+                this.setColor(this.getColorAt(coords.x, coords.y))
+                this.$emit('color-selected', this.color, this.hex, this.rgbValues, this.auto);
+            }
         }
     },
     data() {
@@ -92,14 +94,15 @@ export default {
             dragging: false,
             keyDown: false,
             pointerPosition: 0,
-            top: 0
+            top: 0,
+            auto: false // whether or not the slider position was calculated automatically
         }
     }
 }
 </script>
 
 <style scoped>
-canvas {
+/*canvas {
     cursor: pointer;
     border: 1px solid #999;
 }
@@ -123,6 +126,43 @@ canvas {
 .slider-container {
     position: relative;
     display: inline-flex;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+}
+
+.slider-container:focus {
+    outline: none;
+}*/
+
+canvas {
+    cursor: pointer;
+    border: 1px solid #999;
+}
+
+.pointer {
+    cursor: pointer;
+    width: 36px;
+    height: 5px;
+    border: 1px solid #999;
+    background: #fff;
+    margin-left: -3;
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0.8;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+}
+
+.slider-container {
+    position: relative;
+    width: 30px;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    float: left;
 }
 
 .slider-container:focus {

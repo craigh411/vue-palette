@@ -15,6 +15,10 @@ export default {
         isHex(color) {
             return /^#([A-Fa-f0-9]{3}){1,2}$/.test(color);
         },
+        getRgbVals(color){
+            let rgb = color.match(/^rgba?[\s+]?\([\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?/i);
+            return [parseInt(rgb[1], 10), parseInt(rgb[2], 10), parseInt(rgb[3], 10)];
+        },
         hexToRgb(hex) {
             if (this.isHex(hex)) {
                 let color = hex.substring(1).split('');
@@ -23,6 +27,13 @@ export default {
                 return 'rgba(' + [(color >> 16) & 255, (color >> 8) & 255, color & 255].join(',') + ',1)';
             }
             throw new Error('Invalid Hex Value');
+        },
+        setColor(color) {
+            if (this.isHex(color)) {
+                this.color = this.hexToRgb(color);
+            } else {
+                this.color = color;
+            }
         }
     },
     data() {
