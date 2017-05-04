@@ -6,13 +6,13 @@
 </template>
 
 <script type="text/javascript">
-import ColorFormatter from './mixins/ColorFormatter';
-import CanvasHelper from './mixins/CanvasHelper';
+import ColorCanvas from './mixins/ColorCanvas';
+
 export default {
-    mixins: [ColorFormatter, CanvasHelper],
+    mixins: [ColorCanvas],
     props: {
         spectrum: {
-            default: 'rgba(255,0,0,1)',
+            default: '#ff0000',
             type: String
         },
         startPosition: {
@@ -49,7 +49,7 @@ export default {
             this.fillGradient();
         },
         fillGradient() {
-            this.ctx.fillStyle = this.color;
+            this.ctx.fillStyle = this.rgb;
             this.ctx.fillRect(0, 0, 150, 150);
             var grdWhite = this.ctx.createLinearGradient(0, 0, 150, 0);
             grdWhite.addColorStop(0, 'rgba(255,255,255,1)');
@@ -61,10 +61,10 @@ export default {
             grdBlack.addColorStop(1, 'rgba(0,0,0,1)');
             this.ctx.fillStyle = grdBlack;
             this.ctx.fillRect(0, 0, 150, 150);
-            this.color = this.getColorAt(
+            this.setColor(this.getColorAt(
                 this.forceRange(this.pointerPosition.x, 0, 150),
                 this.forceRange(this.pointerPosition.y, 0, 150)
-            );
+            ));
         },
         forceRange(val, min, max) {
             return Math.max(min, Math.min(max, val))
@@ -75,13 +75,13 @@ export default {
                 let y = this.forceRange(e.clientY - this.boundingBox.top, 0, 149);
                 // Just ensure the correct colors are in the corners as they differ slightly due to gradient
                 if (x <= 1 && y <= 1) {
-                    this.color = 'rgba(255, 255, 255, 1)';
+                    this.setColor('#fff');
                 } else if (y >= 149) {
-                    this.color = 'rgba(0, 0, 0, 1)';
+                    this.setColor('#000');
                 } else if (x >= 149 && y <= 1) {
                     this.setColor(this.spectrum);
                 } else {
-                    this.color = this.getColorAt(x, y);
+                    this.setColor(this.getColorAt(x, y));
                 }
                 this.setPointerPosition(x, y);
             }
@@ -95,12 +95,12 @@ export default {
     },
     watch: {
         spectrum(val) {
-            this.color = val;
+            this.setColor(val);
             this.fillGradient();
         },
         color() {
             if (this.color) {
-                this.$emit('color-selected', this.color, this.hex, this.rgbValues);
+                this.$emit('color-selected', this.rgb, this.hex, this.rgbValues);
             }
         },
         startColor(val) {

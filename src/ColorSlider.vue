@@ -6,18 +6,15 @@
 </template>
 
 <script type="text/javascript">
-import ColorFormatter from './mixins/ColorFormatter';
-import CanvasHelper from './mixins/CanvasHelper';
+import ColorCanvas from './mixins/ColorCanvas';
+
 export default {
-    mixins: [ColorFormatter, CanvasHelper],
+    mixins: [ColorCanvas],
     props: {
         startColor: {
-            default: 'rgba(255,0,0, 1)',
+            default: '#ff0000',
             type: String
         }
-    },
-    created() {
-        this.setColor(this.startColor);
     },
     mounted() {
         this.top = this.$refs.sliderContainer.getBoundingClientRect().top;
@@ -42,13 +39,14 @@ export default {
             grd.addColorStop(1, 'rgba(255, 0, 0, 1)');
             this.ctx.fillStyle = grd;
             this.ctx.fill();
+
             this.setPointerPosition(this.findColor(this.rgbValues, 1, 1, 0, 150).y);
         },
         changeColor(e) {
             if (this.dragging || e.type === "click") {
                 let y = e.clientY - this.top;
                 this.setPointerPosition(y, e.type);
-                this.color = this.getColorAt(1, this.pointerPosition);
+                this.setColor(this.getColorAt(1, this.pointerPosition));
             }
         },
         setPointerPosition(y, type = null) {
@@ -60,7 +58,7 @@ export default {
                 let moveOffset = (e.code === "ArrowUp") ? -1 : 1;
                 let newPosition = this.pointerPosition + moveOffset;
                 this.setPointerPosition(newPosition, "click");
-                this.color = this.getColorAt(1, this.pointerPosition)
+                this.setColor(this.getColorAt(1, this.pointerPosition));
             }
         },
         focus(doFocus) {
@@ -74,18 +72,22 @@ export default {
     watch: {
         color() {
             if (this.color) {
-                this.$emit('color-selected', this.color, this.hex, this.rgbValues, this.auto);
+                this.$emit('color-selected', this.rgb, this.hex, this.rgbValues, this.auto);
                 this.auto = false;
             }
         },
         startColor(val) {
             if (val) {
                 this.setColor(val);
-                let coords = this.findColor(this.rgbValues, 1, 1, 0, 149);
+                //console.log(this.getBrightness(this.rgbValues))
+                //let find = (this.getBrightness(this.rgbValues) > 200) ? this.darken(this.rgbValue) : this.rgbValues;
+                //console.log(this.darken(this.rgbValues,-100));
+                let coords = this.findColor(this.rgbValues, 1, 1, 0, 149, this.color.brightness());
+                //console.log(this.getColorAt(coords.x, coords.y));
                 this.setPointerPosition(coords.y);
                 this.auto = true;
                 this.setColor(this.getColorAt(coords.x, coords.y))
-                this.$emit('color-selected', this.color, this.hex, this.rgbValues, this.auto);
+                this.$emit('color-selected', this.rgb, this.hex, this.rgbValues, this.auto);
             }
         }
     },

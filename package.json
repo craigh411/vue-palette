@@ -44,6 +44,7 @@
     "webpack-dev-server": "^2.4.5"
   },
   "dependencies": {
+    "delta-e": "0.0.7",
     "lodash.debounce": "^4.0.8"
   }
 }

@@ -5,17 +5,17 @@
 
             <color-slider @color-selected="setSliderColor" :start-color="sSliderColor"></color-slider>
             <div class="hex">
-                <input :class="{'error' : hexError}" :value="color" @blur="changeColor" placeholder="Hex" />
+                <input :class="{error : hexError}" :value="color" @blur="changeColor" placeholder="Hex" />
             </div>
             <div class="rgb">
                 <div class="item">
-                    <input :class="{'error' : hexError}" :value="r" placeholder="R" />
+                    <input :value="r" placeholder="R" />
                 </div>
                 <div class="item">
-                    <input :class="{'error' : hexError}" :value="g" placeholder="G" />
+                    <input :value="g" placeholder="G" />
                 </div>
                 <div class="item">
-                    <input :class="{'error' : hexError}" :value="b" placeholder="B" />
+                    <input :value="b" placeholder="B" />
                 </div>
             </div>
         </div>
@@ -25,13 +25,13 @@
 <script type="text/javascript">
 import ColorSlider from './ColorSlider.vue';
 import ColorSelector from './ColorSelector.vue';
-import ColorFormatter from './mixins/ColorFormatter';
+import Color from './classes/Color';
+
 export default {
     components: {
         ColorSlider,
         ColorSelector
     },
-    mixins: [ColorFormatter],
     props: {
         startColor: {
             default: '#ff0000',
@@ -71,13 +71,17 @@ export default {
             this.$emit('color-selected', rgb, hex, rgbArray)
         },
         changeColor(e) {
-            if (this.isHex(e.target.value)) {
+            this.hexError = true;
+            if (Color.isHex(e.target.value)) {
                 if (e.target.value !== this.color) {
                     this.targetColor = e.target.value;
                     this.sSliderColor = e.target.value;
                 }
-            } else {
-                this.hexError = true;
+                this.hexError = false;
+            }
+
+            if(this.hexError){
+                this.color = e.target.value
             }
         }
     },
@@ -134,15 +138,11 @@ export default {
     float: left;
     width: 50px;
     font-size: 0.8em;
-}
-
-.rgb > .item > label {
-    float: left;
+    padding:5px;
+    padding-left:0px;
 }
 
 .rgb > .item > input {
-    margin: 5px;
-    margin-left: 0px;
     width: 40px;
     float: left;
 }
@@ -159,6 +159,7 @@ export default {
 }
 
 .error {
-    border: 1px solid #ff464a;
+    border: 1px solid #ff9391 !important;
+    background:#feebfc;
 }
 </style>
