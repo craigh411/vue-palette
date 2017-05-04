@@ -1,4 +1,5 @@
 import ColorFactory from '../classes/ColorFactory';
+import Color from '../classes/Color';
 
 export default {
     props: {
@@ -29,19 +30,21 @@ export default {
             let imageData = this.ctx.getImageData(x, y, 1, 1).data;
             return 'rgba(' + imageData[0] + ',' + imageData[1] + ',' + imageData[2] + ',1)';
         },
-        findColor(rgb, fromX, toX, fromY, toY, maxLuma = 255) {
+        findColor(rgb, fromX, toX, fromY, toY) {
             let position = {
                 x: 0,
                 y: 0
             };
             let min = null;
+            let lab = Color.lab(this.rgbValues);
+
             for (let i = fromX; i <= toX; i++) {
                 for (let j = fromY; j <= toY; j++) {
                     let data = this.ctx.getImageData(i, j, 1, 1).data;
-                    let compColor = ColorFactory.create([data[0],data[1],data[2]]);
-                    let diff = this.color.compare(compColor);
+                    let compColor = Color.lab(data);
+                    let diff = Color.compare(lab, compColor);
 
-                    if (diff < min || !min && compColor.brightness() <= maxLuma) {
+                    if (diff < min || !min) {
                         min = diff;
                         position = { x: i, y: j };
                     }

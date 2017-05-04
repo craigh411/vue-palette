@@ -23,8 +23,8 @@ class Color {
         return this.rgbVals;
     }
 
-    xyz() {
-        let rgb = this.rgbVals;
+    static xyz(rgb) {
+        // let rgb = this.rgbVals;
 
         let R = (rgb[0] / 255)
         let G = (rgb[1] / 255)
@@ -42,11 +42,11 @@ class Color {
         let Y = 0.222491598 * R + 0.71688606 * G + 0.060621486 * B;
         let Z = 0.013929122 * R + 0.097097002 * G + 0.71418547 * B;
 
-        return {X: X, Y: Y, Z: Z}
+        return { X: X, Y: Y, Z: Z }
     }
 
-    lab() {
-        let {X, Y, Z} = this.xyz();
+    static lab(rgb) {
+        let { X, Y, Z } = Color.xyz(rgb);
 
         let Xr = 0.964221; // reference white D50
         let Yr = 1.0;
@@ -70,39 +70,29 @@ class Color {
         lab[0] = (2.55 * Ls + 0.5);
         lab[1] = (as + 0.5);
         lab[2] = (bs + 0.5);
-        
-        return { L:lab[0], A: lab[1], B: lab[2] };
+
+        return { L: lab[0], A: lab[1], B: lab[2] };
     }
 
-   
-    /**
-     * Returns the distance between two colors. (Use realCompare for getting value of deltaE value)
-     */
-    compare(color, formula) {
-        if (color instanceof Color) {
-            let comp = color.lab();
-            let lab = this.lab();
-             
-            if(formula === "E76"){
-            	return DeltaE.getDeltaE76(lab, comp);
-            }else if(formula === "E94"){
-            	return DeltaE.getDeltaE94(lab, comp);
-            } 
-
-            return DeltaE.getDeltaE00(lab, comp);
-
+    static compare(color1, color2, formula) {
+        if (formula === "E76") {
+            return DeltaE.getDeltaE76(color1, color2);
+        } else if (formula === "E94") {
+            return DeltaE.getDeltaE94(color1, color2);
         }
 
-        throw new Error('Compare requires Color object');
+        return DeltaE.getDeltaE00(color1, color2);
     }
 
     /**
-     * Returns the real lab deltaE (square rooted).
+     * Returns the distance between two colors. If calling multiple times it will be faster to use the static compare method.
+     * @param Color color - The color to compare to.
+     * @param String forumla - the DeltaE formula (either "E76", "E94") defaults to E00.
      */
-    realCompare(color) {
-        return Math.sqrt(this.compare(color));
-    }
+    compareTo(color, formula) {
 
+        return Color.compare(Color.lab(this.color.rgbVals), Color.lab(color.rgbVals), formula);
+    }
 
     brightness() {
         let rgb = this.rgbVals;
@@ -117,13 +107,14 @@ class Color {
 
     }
 
-    format(){
-      return Color.detectFormat();
+    format() {
+        return Color.detectFormat();
     }
 
     /**
      * Static methods required for factory function
      */
+
     static isHex(color) {
         return /^#([A-Fa-f0-9]{3}){1,2}$/.test(color);
     }
