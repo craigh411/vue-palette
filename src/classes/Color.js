@@ -103,7 +103,14 @@ class Color {
 
     }
 
-    lighten(amount) {
+    static lighten(rgb, amount) {
+      let [R,G,B] = rgb;
+
+      R =  Math.min(255, R + amount),
+      G =  Math.min(255, G + amount),
+      B =  Math.min(255, B + amount);
+
+      return [R,G,B];
 
     }
 

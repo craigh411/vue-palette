@@ -23,10 +23,6 @@ export default {
                 }
             },
             type: Object
-        },
-        startColor: {
-            default: '#ff0000',
-            type: String
         }
     },
     created() {
@@ -100,6 +96,7 @@ export default {
         },
         color() {
             if (this.color) {
+
                 this.$emit('color-selected', this.rgb, this.hex, this.rgbValues);
             }
         },

@@ -18,7 +18,8 @@ module.exports = function(env) {
                 loader: 'babel-loader',
                 exclude: /node_modules/
             }]
-        }
+        },
+        devtool: 'source-map'
     }
 }
 

@@ -12,7 +12,7 @@ export default {
         document.addEventListener('mouseup', () => {
             this.dragging = false;
         });
-        this.color = ColorFactory.create(this.startColor);
+        this.setColor(this.startColor);
     },
     computed: {
         hex() {
@@ -28,7 +28,8 @@ export default {
     methods: {
         getColorAt(x, y) {
             let imageData = this.ctx.getImageData(x, y, 1, 1).data;
-            return 'rgba(' + imageData[0] + ',' + imageData[1] + ',' + imageData[2] + ',1)';
+            return [imageData[0], imageData[1], imageData[2]];
+           // return 'rgba(' + imageData[0] + ',' + imageData[1] + ',' + imageData[2] + ',1)';
         },
         findColor(rgb, fromX, toX, fromY, toY) {
             let position = {

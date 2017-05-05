@@ -10,12 +10,6 @@ import ColorCanvas from './mixins/ColorCanvas';
 
 export default {
     mixins: [ColorCanvas],
-    props: {
-        startColor: {
-            default: '#ff0000',
-            type: String
-        }
-    },
     mounted() {
         this.top = this.$refs.sliderContainer.getBoundingClientRect().top;
         document.addEventListener('mousemove', e => {
@@ -41,6 +35,7 @@ export default {
             this.ctx.fill();
 
             this.setPointerPosition(this.findColor(this.rgbValues, 1, 1, 0, 150).y);
+            this.$emit('loaded', this.sliderColors);
         },
         changeColor(e) {
             if (this.dragging || e.type === "click") {
@@ -69,6 +64,16 @@ export default {
             }
         }
     },
+    computed:{
+      sliderColors(){
+        let colors = [];
+        for(let i = 0; i < 150; i++){
+          colors[i] = this.getColorAt(1,i);
+        }
+
+        return colors;
+      }
+    },
     watch: {
         color() {
             if (this.color) {
@@ -82,7 +87,7 @@ export default {
                 //console.log(this.getBrightness(this.rgbValues))
                 //let find = (this.getBrightness(this.rgbValues) > 200) ? this.darken(this.rgbValue) : this.rgbValues;
                 //console.log(this.darken(this.rgbValues,-100));
-                let coords = this.findColor(this.rgbValues, 1, 1, 0, 149, this.color.brightness());
+                let coords = this.findColor(this.rgbValues, 1, 1, 0, 149);
                 //console.log(this.getColorAt(coords.x, coords.y));
                 this.setPointerPosition(coords.y);
                 this.auto = true;
@@ -104,38 +109,7 @@ export default {
 </script>
 
 <style scoped>
-/*canvas {
-    cursor: pointer;
-    border: 1px solid #999;
-}
 
-.pointer {
-    cursor: pointer;
-    width: 36px;
-    height: 5px;
-    border: 1px solid #999;
-    background: #fff;
-    margin-left: -3;
-    position: absolute;
-    top: 0;
-    left: 0;
-    opacity: 0.8;
-    -moz-user-select: none;
-    -webkit-user-select: none;
-    -ms-user-select: none;
-}
-
-.slider-container {
-    position: relative;
-    display: inline-flex;
-    -moz-user-select: none;
-    -webkit-user-select: none;
-    -ms-user-select: none;
-}
-
-.slider-container:focus {
-    outline: none;
-}*/
 
 canvas {
     cursor: pointer;
