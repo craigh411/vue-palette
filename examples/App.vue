@@ -1,9 +1,9 @@
 <template>
     <div>
 
-<!-- <color-slider @color-selected="setColor"></color-slider> -->
-        <color-picker @color-selected="setColor"></color-picker>
-        <div class="block" :style="{background: color}">{{color}}</div>
+        <!-- <color-slider @color-selected="setColor"></color-slider> -->
+        <color-picker @color-selected="setColor" select-color="#ffdada"></color-picker>
+        <div class="block" :style="{background: hex}">{{hex}}<br />{{rgb}}</div>
     </div>
 </template>
 
@@ -16,22 +16,30 @@ export default {
         ColorPicker,
         ColorSlider
     },
-    created(){
-       //let color = ColorFactory.create([255,0,0]);
-      //console.log(color.getBrightness())
-      // console.log(color.compare(ColorFactory.create([0,0,0])));
+    created() {
+        //let color = ColorFactory.create([255,0,0]);
+        //console.log(color.getBrightness())
+        // console.log(color.compare(ColorFactory.create([0,0,0])));
     },
     methods: {
         setSliderColor(rgb, hex) {
             this.sliderColor = hex;
         },
-        setColor(rgb, hex) {
-            this.color = hex;
+        setColor(hex, color) {
+            this.color = color;
+        }
+    },
+    computed: {
+        hex() {
+            return (this.color) ? this.color.hex() : "#ff0000";
+        },
+        rgb() {
+            return (this.color) ? this.color.rgb() : "";
         }
     },
     data() {
         return {
-            color: '#0ABAB5',
+            color: null,
             sliderColor: '#0ABAB5'
         }
     }

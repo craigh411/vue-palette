@@ -8,6 +8,7 @@ export default {
             type: String
         }
     },
+    inject:['store'],
     created() {
         document.addEventListener('mouseup', () => {
             this.dragging = false;

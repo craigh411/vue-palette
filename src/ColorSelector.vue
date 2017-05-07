@@ -7,12 +7,15 @@
 
 <script type="text/javascript">
 import ColorCanvas from './mixins/ColorCanvas';
-
 export default {
     mixins: [ColorCanvas],
     props: {
         spectrum: {
             default: '#ff0000',
+            type: String
+        },
+        selectColor: {
+            default: "#eeeeee",
             type: String
         },
         startPosition: {
@@ -37,6 +40,9 @@ export default {
     mounted() {
         this.buildSelector();
         this.boundingBox = this.$refs.selector.getBoundingClientRect();
+
+        let coords = this.findColor(this.rgbValues, 1, 150, 1, 150);
+        this.setPointerPosition(coords.x, coords.y);
     },
     methods: {
         buildSelector() {
@@ -96,16 +102,14 @@ export default {
         },
         color() {
             if (this.color) {
-
-                this.$emit('color-selected', this.rgb, this.hex, this.rgbValues);
+                this.$emit('color-selected', this.color, this.rgb, this.hex, this.rgbValues);
             }
         },
-        startColor(val) {
+        selectColor(val) {
             if (val) {
                 this.setColor(val);
                 let coords = this.findColor(this.rgbValues, 1, 150, 1, 150);
                 this.setPointerPosition(coords.x, coords.y);
-                this.setColor(val);
             }
         }
     },
@@ -119,36 +123,6 @@ export default {
 </script>
 
 <style scoped>
-/*.selector > canvas {
-    cursor: pointer;
-}
-
-.selector {
-    display: inline-flex;
-    position: relative;
-    border: 1px solid #999;
-    -moz-user-select: none;
-    -webkit-user-select: none;
-    -ms-user-select: none;
-}
-
-.pointer {
-    cursor: pointer;
-    width: 5px;
-    height: 5px;
-    border-radius: 10px;
-    border: 1px solid #fff;
-    background: #000;
-    margin-left: -3;
-    position: absolute;
-    top: 0;
-    left: 0;
-    opacity: 0.8;
-    -moz-user-select: none;
-    -webkit-user-select: none;
-    -ms-user-select: none;
-}*/
-
 .pointer {
     cursor: pointer;
     width: 5px;

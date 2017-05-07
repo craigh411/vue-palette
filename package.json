@@ -44,6 +44,7 @@
     "webpack-dev-server": "^2.4.5"
   },
   "dependencies": {
-    "delta-e": "0.0.7"
+    "delta-e": "0.0.7",
+    "rainbowvis.js": "^1.0.1"
   }
 }

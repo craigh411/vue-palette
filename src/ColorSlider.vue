@@ -7,6 +7,7 @@
 
 <script type="text/javascript">
 import ColorCanvas from './mixins/ColorCanvas';
+import Color from './classes/Color';
 
 export default {
     mixins: [ColorCanvas],
@@ -33,7 +34,6 @@ export default {
             grd.addColorStop(1, 'rgba(255, 0, 0, 1)');
             this.ctx.fillStyle = grd;
             this.ctx.fill();
-
             this.setPointerPosition(this.findColor(this.rgbValues, 1, 1, 0, 150).y);
             this.$emit('loaded', this.sliderColors);
         },
@@ -54,6 +54,7 @@ export default {
                 let newPosition = this.pointerPosition + moveOffset;
                 this.setPointerPosition(newPosition, "click");
                 this.setColor(this.getColorAt(1, this.pointerPosition));
+                this.store.updateSlider(this.hex, false);
             }
         },
         focus(doFocus) {
@@ -62,37 +63,40 @@ export default {
             } else {
                 this.$refs.sliderContainer.blur();
             }
+        },
+        moveSliderToColor(color) {
+            this.setColor(color);
+            let coords = this.findColor(this.rgbValues, 1, 1, 0, 149);
+            this.setPointerPosition(coords.y);
+            this.auto = true;
+            this.setColor(this.getColorAt(coords.x, coords.y))
+            this.store.updateSlider(this.hex, this.auto);
         }
     },
-    computed:{
-      sliderColors(){
-        let colors = [];
-        for(let i = 0; i < 150; i++){
-          colors[i] = this.getColorAt(1,i);
+    computed: {
+        sliderColors() {
+            let colors = [];
+            for (let i = 0; i < 150; i++) {
+                colors[i] = this.getColorAt(1, i);
+            }
+            return colors;
+        },
+        sliderColor() {
+            return this.store.slider;
         }
-
-        return colors;
-      }
     },
     watch: {
         color() {
             if (this.color) {
-                this.$emit('color-selected', this.rgb, this.hex, this.rgbValues, this.auto);
-                this.auto = false;
+                this.store.updateSlider(this.hex, this.auto);
+               // this.auto = false;
             }
         },
-        startColor(val) {
+        sliderColor(val) {
             if (val) {
                 this.setColor(val);
-                //console.log(this.getBrightness(this.rgbValues))
-                //let find = (this.getBrightness(this.rgbValues) > 200) ? this.darken(this.rgbValue) : this.rgbValues;
-                //console.log(this.darken(this.rgbValues,-100));
-                let coords = this.findColor(this.rgbValues, 1, 1, 0, 149);
-                //console.log(this.getColorAt(coords.x, coords.y));
+                let coords = this.findColor(this.hex, 1, 1, 0, 149);
                 this.setPointerPosition(coords.y);
-                this.auto = true;
-                this.setColor(this.getColorAt(coords.x, coords.y))
-                this.$emit('color-selected', this.rgb, this.hex, this.rgbValues, this.auto);
             }
         }
     },
@@ -109,8 +113,6 @@ export default {
 </script>
 
 <style scoped>
-
-
 canvas {
     cursor: pointer;
     border: 1px solid #999;

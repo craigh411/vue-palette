@@ -114,6 +114,7 @@ class Color {
 
     }
 
+
     format() {
         return Color.detectFormat();
     }
