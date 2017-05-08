@@ -4,17 +4,17 @@
             <color-selector :spectrum="slider" :select-color="select" @color-selected="setColor"></color-selector>
             <color-slider @loaded="setSliderColors"></color-slider>
             <div class="hex">
-                <input :class="{error : hexError}" @blur="updateColor($event.target.value)" :value="hex" placeholder="Hex" />
+                <input :class="{error : hexError}" @blur="updateColor($event.target.value)" :value="hex" placeholder="Hex" @paste="updateColor($event.target.value)" />
             </div>
             <div class="rgb">
                 <div class="item">
                     <input :value="rgbVals[0]" @blur="setRGB(0, $event.target.value)" placeholder="R" />
                 </div>
                 <div class="item">
-                    <input :value="rgbVals[1]"  @blur="setRGB(1, $event.target.value)" placeholder="G" />
+                    <input :value="rgbVals[1]" @blur="setRGB(1, $event.target.value)" placeholder="G" />
                 </div>
                 <div class="item">
-                    <input :value="rgbVals[2]"  @blur="setRGB(2, $event.target.value)" placeholder="B" />
+                    <input :value="rgbVals[2]" @blur="setRGB(2, $event.target.value)" placeholder="B" />
                 </div>
             </div>
         </div>
@@ -56,8 +56,15 @@ export default {
         rgb() {
             return (this.color) ? this.color.rgb() : "";
         },
-        rgbVals(){
-            return (this.rgb) ? this.color.rgbArray() : [0,0,0];
+        rgbVals() {
+            return (this.color) ? this.color.rgbArray() : [0, 0, 0];
+        },
+        hsv() {
+            return (this.color) ? this.color.hsv() : {
+                h: 1,
+                s: 1,
+                v: 1
+            };
         }
     },
     methods: {
@@ -65,8 +72,16 @@ export default {
             this.sliderColors = colors;
         },
         updateColor(hex) {
-            if (Color.isHex(hex)) {
-                store.updateSlider(this.getClosestSliderMatch(hex));
+            if (Color.isHex(hex) && hex !== this.hex) {
+                let color = ColorFactory.create(hex);
+                color = color.hsv();
+                let sliderColor = Object.assign(color, {
+                    s: 100,
+                    v: 100
+                })
+                sliderColor = Color.HSVtoRGB(sliderColor);
+                sliderColor = ColorFactory.create(sliderColor);
+                store.updateSlider(sliderColor.hex());
                 this.select = null;
                 this.$nextTick(() => {
                     this.select = Color.normaliseHex(hex);
@@ -74,36 +89,14 @@ export default {
                 });
             }
         },
-        getClosestSliderMatch(target) {
-            let difference = [];
-            let targetColor = ColorFactory.create(target);
-            target = Color.lab(targetColor.rgbArray());
-            if (targetColor.brightness() < 100) {
-                target = ColorFactory.create(Color.RgbToHex(Color.lighten(targetColor.rgbArray(), 50)));
-                target = Color.lab(target.rgbArray())
-            }
-            for (let i = 0; i < this.sliderColors.length; i++) {
-                let color = Color.lab(this.sliderColors[i]);
-                difference[i] = {
-                    color: this.sliderColors[i],
-                    diff: Color.compare(color, target)
-                };
-            }
-            difference.sort((a, b) => {
-                return a.diff - b.diff;
-            });
-            return Color.RgbToHex(difference[0].color);
-        },
         setColor(color, hex) {
             this.color = color;
             this.$emit('color-selected', this.hex, color);
         },
-        setRGB(index, value){
+        setRGB(index, value) {
             let rgb = this.rgbVals;
-
-            rgb[index] = Math.max(0,Math.min(255,parseInt(value)));
-            let hex = Color.RgbToHex(rgb); 
-
+            rgb[index] = Math.max(0, Math.min(255, parseInt(value)));
+            let hex = Color.RgbToHex(rgb);
             this.updateColor(hex);
         }
     },

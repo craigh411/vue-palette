@@ -17,20 +17,11 @@ export default {
         selectColor: {
             default: "#eeeeee",
             type: String
-        },
-        startPosition: {
-            default: function() {
-                return {
-                    x: 10,
-                    y: 10
-                }
-            },
-            type: Object
         }
     },
     created() {
         this.setColor(this.spectrum);
-        this.pointerPosition = this.startPosition;
+        this.pointerPosition = {x:0, y:0};
         document.addEventListener('mousemove', e => {
             if (this.dragging) {
                 this.changeColor(e);
@@ -102,7 +93,7 @@ export default {
         },
         color() {
             if (this.color) {
-                this.$emit('color-selected', this.color, this.rgb, this.hex, this.rgbValues);
+                this.$emit('color-selected', this.color);
             }
         },
         selectColor(val) {

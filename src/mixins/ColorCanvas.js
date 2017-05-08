@@ -8,7 +8,7 @@ export default {
             type: String
         }
     },
-    inject:['store'],
+    inject: ['store'],
     created() {
         document.addEventListener('mouseup', () => {
             this.dragging = false;
@@ -30,7 +30,7 @@ export default {
         getColorAt(x, y) {
             let imageData = this.ctx.getImageData(x, y, 1, 1).data;
             return [imageData[0], imageData[1], imageData[2]];
-           // return 'rgba(' + imageData[0] + ',' + imageData[1] + ',' + imageData[2] + ',1)';
+            // return 'rgba(' + imageData[0] + ',' + imageData[1] + ',' + imageData[2] + ',1)';
         },
         findColor(rgb, fromX, toX, fromY, toY) {
             let position = {
@@ -38,18 +38,24 @@ export default {
                 y: 0
             };
             let min = null;
-            let lab = Color.lab(this.rgbValues);
+            let lab = Color.upLab(this.rgbValues);
 
             for (let i = fromX; i <= toX; i++) {
                 for (let j = fromY; j <= toY; j++) {
                     let data = this.ctx.getImageData(i, j, 1, 1).data;
-                    let compColor = Color.lab(data);
+                    let compColor = Color.upLab(data);
                     let diff = Color.compare(lab, compColor);
 
                     if (diff < min || !min) {
                         min = diff;
                         position = { x: i, y: j };
+                        if (min === 0) {
+                            break;
+                        }
                     }
+                }
+                if (min === 0) {
+                    break;
                 }
             }
 

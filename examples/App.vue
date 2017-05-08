@@ -3,7 +3,13 @@
 
         <!-- <color-slider @color-selected="setColor"></color-slider> -->
         <color-picker @color-selected="setColor" select-color="#ffdada"></color-picker>
-        <div class="block" :style="{background: hex}">{{hex}}<br />{{rgb}}</div>
+        <div class="block" :style="{background: hex}">{{hex}}</div>
+        <div>rgb: {{rgb}}</div>
+        <div>rgb values: {{rgbVals}}</div>
+        <div>HSV: {{hsv}}</div>
+        <div>HSL: {{hsl}}</div>
+        <div>UP Lab: {{upLab}}</div>
+        <div>XYZ: {{xyz}}</div>
     </div>
 </template>
 
@@ -35,6 +41,33 @@ export default {
         },
         rgb() {
             return (this.color) ? this.color.rgb() : "";
+        },
+        rgbVals() {
+            return (this.color) ? this.color.rgbArray() : [0, 0, 0];
+        },
+        hsv() {
+            return (this.color) ? this.color.hsv() : {
+                h: 0,
+                s: 0,
+                v: 0
+            };
+        },
+        upLab() {
+            return (this.color) ? this.color.upLab() : {
+                l: 0,
+                a: 0,
+                b: 0
+            };
+        },
+        xyz() {
+            return (this.color) ? this.color.xyz() : {
+                x: 0,
+                y: 0,
+                z: 0
+            };
+        },
+        hsl() {
+            return (this.color) ? this.color.hsl() : [0,0,0];
         }
     },
     data() {

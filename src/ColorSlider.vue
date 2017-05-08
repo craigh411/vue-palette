@@ -8,7 +8,6 @@
 <script type="text/javascript">
 import ColorCanvas from './mixins/ColorCanvas';
 import Color from './classes/Color';
-
 export default {
     mixins: [ColorCanvas],
     mounted() {
@@ -54,7 +53,7 @@ export default {
                 let newPosition = this.pointerPosition + moveOffset;
                 this.setPointerPosition(newPosition, "click");
                 this.setColor(this.getColorAt(1, this.pointerPosition));
-                this.store.updateSlider(this.hex, false);
+                this.store.updateSlider(this.hex);
             }
         },
         focus(doFocus) {
@@ -68,9 +67,8 @@ export default {
             this.setColor(color);
             let coords = this.findColor(this.rgbValues, 1, 1, 0, 149);
             this.setPointerPosition(coords.y);
-            this.auto = true;
             this.setColor(this.getColorAt(coords.x, coords.y))
-            this.store.updateSlider(this.hex, this.auto);
+            this.store.updateSlider(this.hex);
         }
     },
     computed: {
@@ -88,8 +86,7 @@ export default {
     watch: {
         color() {
             if (this.color) {
-                this.store.updateSlider(this.hex, this.auto);
-               // this.auto = false;
+                this.store.updateSlider(this.hex);
             }
         },
         sliderColor(val) {
