@@ -1,15 +1,16 @@
 <template>
     <div>
+        <color-picker :start-color="hex" @color-selected="setColor"></color-picker>
 
-        <!-- <color-slider @color-selected="setColor"></color-slider> -->
-        <color-picker @color-selected="setColor" select-color="#ffdada"></color-picker>
         <div class="block" :style="{background: hex}">{{hex}}</div>
-        <div>rgb: {{rgb}}</div>
-        <div>rgb values: {{rgbVals}}</div>
-        <div>HSV: {{hsv}}</div>
-        <div>HSL: {{hsl}}</div>
-        <div>UP Lab: {{upLab}}</div>
-        <div>XYZ: {{xyz}}</div>
+        <div class="colors">
+            <div>rgb: {{rgb}}</div>
+            <div>rgb values: {{rgbVals}}</div>
+            <div>HSV: {{hsv}}</div>
+            <div>HSL: {{hsl}}</div>
+            <div>UP Lab: {{upLab}}</div>
+            <div>XYZ: {{xyz}}</div>
+        </div>
     </div>
 </template>
 
@@ -23,16 +24,33 @@ export default {
         ColorSlider
     },
     created() {
-        //let color = ColorFactory.create([255,0,0]);
-        //console.log(color.getBrightness())
-        // console.log(color.compare(ColorFactory.create([0,0,0])));
+        document.addEventListener('click', () => {
+            if (!this.editing) {
+                this.showPicker = false;
+            }
+        })
+        this.color = ColorFactory.create("#ffdada");
     },
     methods: {
         setSliderColor(rgb, hex) {
             this.sliderColor = hex;
         },
-        setColor(hex, color) {
+        setColor(color) {
             this.color = color;
+        },
+        close() {
+            if (!this.edited) {
+                this.showPicker = false;
+            }
+        },
+        open() {
+            this.edited = false;
+            this.editing = true;
+            this.showPicker = true;
+        },
+        setEditing(val) {
+            this.editing = val;
+            this.edited = true;
         }
     },
     computed: {
@@ -67,25 +85,37 @@ export default {
             };
         },
         hsl() {
-            return (this.color) ? this.color.hsl() : [0,0,0];
+            return (this.color) ? this.color.hsl() : [0, 0, 0];
         }
     },
     data() {
         return {
             color: null,
-            sliderColor: '#0ABAB5'
+            sliderColor: '#0ABAB5',
+            showPicker: false,
+            editing: false,
+            edited: false
         }
     }
 }
 </script>
 
 <style>
+.text-picker {
+    position: relative;
+}
+
 .block {
     width: 100px;
     height: 100px;
     border: 1px solid black;
     margin: 10px;
+    margin-top: 300px;
     float: left;
+}
+
+.colors {
+    margin-top: 300px;
 }
 
 .color-picker {

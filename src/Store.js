@@ -7,12 +7,16 @@ var store = new Vue({
         },
         updateDragging(isDragging) {
            this.dragging = isDragging;
+        },
+        updateColor(color){
+
         }
     },
     data() {
         return {
             slider: '#ffffff',
-            dragging: false
+            dragging: false,
+            color: '#ffffff'
         }
     }
 });

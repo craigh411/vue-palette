@@ -1,7 +1,7 @@
 <template>
-    <div class="selector" @click="changeColor" @mousedown="dragging = true">
+    <div class="selector" @click="changeColor" @mouseover="selected = true" @mouseout="selected = false" @mousedown.prevent="dragging = true">
         <canvas ref="selector" height="150" width="150"></canvas>
-        <div class="pointer" :style="{left:pointerPosition.x, top: pointerPosition.y}" @mousedown="dragging = true"></div>
+        <div class="pointer" :style="{left:pointerPosition.x, top: pointerPosition.y}" @mousedown.prevent="dragging = true"></div>
     </div>
 </template>
 
@@ -21,17 +21,31 @@ export default {
     },
     created() {
         this.setColor(this.spectrum);
-        this.pointerPosition = {x:0, y:0};
+        this.pointerPosition = {
+            x: 0,
+            y: 0
+        };
         document.addEventListener('mousemove', e => {
             if (this.dragging) {
                 this.changeColor(e);
+                e.preventDefault(); // stop selection of page elements
             }
         });
+        document.addEventListener('keydown', e => {
+            if (this.selected) {
+                this.movePointer(e);
+                e.preventDefault();
+            }
+        });
+        this.bus.$on('reflow', () => {
+            this.$nextTick(() => {
+                this.boundingBox = this.$refs.selector.getBoundingClientRect();
+            })
+        })
     },
     mounted() {
         this.buildSelector();
         this.boundingBox = this.$refs.selector.getBoundingClientRect();
-
         let coords = this.findColor(this.rgbValues, 1, 150, 1, 150);
         this.setPointerPosition(coords.x, coords.y);
     },
@@ -67,22 +81,46 @@ export default {
                 let x = this.forceRange(e.clientX - this.boundingBox.left, 0, 149);
                 let y = this.forceRange(e.clientY - this.boundingBox.top, 0, 149);
                 // Just ensure the correct colors are in the corners as they differ slightly due to gradient
-                if (x <= 1 && y <= 1) {
-                    this.setColor('#fff');
-                } else if (y >= 149) {
-                    this.setColor('#000');
-                } else if (x >= 149 && y <= 1) {
-                    this.setColor(this.spectrum);
-                } else {
-                    this.setColor(this.getColorAt(x, y));
-                }
-                this.setPointerPosition(x, y);
+                this.setColorByCoordinates(x, y);
+                /*                if (x <= 1 && y <= 1) {
+                                    this.setColor('#fff');
+                                } else if (y >= 149) {
+                                    this.setColor('#000');
+                                } else if (x >= 149 && y <= 1) {
+                                    this.setColor(this.spectrum);
+                                } else {
+                                    this.setColor(this.getColorAt(x, y));
+                                }
+                                this.setPointerPosition(x, y);*/
             }
+        },
+        setColorByCoordinates(x, y) {
+            if (x <= 1 && y <= 1) {
+                this.setColor('#fff');
+            } else if (y >= 149) {
+                this.setColor('#000');
+            } else if (x >= 149 && y <= 1) {
+                this.setColor(this.spectrum);
+            } else {
+                this.setColor(this.getColorAt(x, y));
+            }
+            this.setPointerPosition(x, y);
         },
         setPointerPosition(x, y) {
             this.pointerPosition = {
                 y: Math.max(1, Math.min(150, y)) - 4,
                 x: Math.max(1, Math.min(150, x) - 3)
+            }
+        },
+        movePointer(e) {
+            if (e.code === "ArrowUp" || e.code === "ArrowDown") {
+                let y = this.pointerPosition.y;
+                y = (e.code === "ArrowUp") ? y + 3 : y + 5;
+                this.setColorByCoordinates(this.pointerPosition.x + 3, y)
+            } else if (e.code === "ArrowLeft" || e.code === "ArrowRight") {
+                let x = this.pointerPosition.x;
+                x = (e.code === "ArrowLeft") ? x + 2 : x + 4;
+                this.setColorByCoordinates(x, this.pointerPosition.y+4)
             }
         }
     },
@@ -93,7 +131,9 @@ export default {
         },
         color() {
             if (this.color) {
-                this.$emit('color-selected', this.color);
+                this.$nextTick(() => {
+                    this.$emit('color-selected', this.color);
+                });
             }
         },
         selectColor(val) {
@@ -107,7 +147,8 @@ export default {
     data() {
         return {
             pointerPosition: {},
-            boundingBox: null
+            boundingBox: null,
+            selected: false
         }
     }
 }

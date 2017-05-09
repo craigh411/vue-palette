@@ -8,11 +8,12 @@ export default {
             type: String
         }
     },
-    inject: ['store'],
+    inject: ['store', 'bus'],
     created() {
         document.addEventListener('mouseup', () => {
             this.dragging = false;
         });
+
         this.setColor(this.startColor);
     },
     computed: {
@@ -50,12 +51,9 @@ export default {
                         min = diff;
                         position = { x: i, y: j };
                         if (min === 0) {
-                            break;
+                            return position;
                         }
                     }
-                }
-                if (min === 0) {
-                    break;
                 }
             }
 
@@ -65,11 +63,17 @@ export default {
             this.color = ColorFactory.create(color);
         }
     },
+    watch: {
+        dragging(val) {
+            this.store.updateDragging(val);
+        }
+    },
     data() {
         return {
             color: '',
             ctx: null,
-            dragging: false
+            dragging: false,
+            boundingBox: null
         }
     }
 }

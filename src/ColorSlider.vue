@@ -1,7 +1,7 @@
 <template>
-    <div ref="sliderContainer" tabindex="0" class="slider-container" @click="changeColor" @mousedown="dragging = true" @mouseover="focus(true)" @mouseout="focus(false)" @keydown="moveSlider">
-        <canvas ref="slider" height="150" width="30"></canvas>
-        <div class="pointer" :style="{top: pointerPosition}" @mousedown="dragging = true"></div>
+    <div ref="sliderContainer" class="slider-container" @click="changeColor" @mousedown="dragging = true" @mouseover="selected = true" @mouseout="selected = false" @keydown="moveSlider">
+        <canvas ref="slider" height="150" width="30" draggable="false"></canvas>
+        <div class="pointer" :style="{top: pointerPosition}" @mousedown="dragging = true" draggable="false"></div>
     </div>
 </template>
 
@@ -10,12 +10,25 @@ import ColorCanvas from './mixins/ColorCanvas';
 import Color from './classes/Color';
 export default {
     mixins: [ColorCanvas],
+    created() {
+        this.bus.$on('reflow', () => {
+            this.$nextTick(() => {
+                this.top = this.$refs.sliderContainer.getBoundingClientRect().top;
+            })
+        })
+    },
     mounted() {
         this.top = this.$refs.sliderContainer.getBoundingClientRect().top;
         document.addEventListener('mousemove', e => {
             if (this.dragging) {
                 this.changeColor(e);
+                e.preventDefault();
             }
+        });
+        document.addEventListener('keydown', e => {
+          if ((e.code === "ArrowUp" || e.code === "ArrowDown") && this.selected) {
+             this.moveSlider(e);
+          }
         });
         this.build();
     },
@@ -101,6 +114,7 @@ export default {
         return {
             dragging: false,
             keyDown: false,
+            selected: false,
             pointerPosition: 0,
             top: 0,
             auto: false // whether or not the slider position was calculated automatically
