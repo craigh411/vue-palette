@@ -9,31 +9,31 @@
 </template>
 
 <script type="text/javascript">
-import ColorFactory from '../src/classes/ColorFactory.js';
-import ColorPickerWindow from '../src/ColorPickerWindow.vue';
-import ColorSlider from '../src/ColorSlider.vue';
-import store from './Store.js';
+import ColorFactory from "../src/classes/ColorFactory.js";
+import ColorPickerWindow from "../src/ColorPickerWindow.vue";
+import ColorSlider from "../src/ColorSlider.vue";
+import store from "./Store.js";
 export default {
     components: {
         ColorPickerWindow,
         ColorSlider
     },
     provide: {
-        'store': store,
+        "store": store
     },
     props: {
         startColor: {
-            default: '#ff0000',
+            default: "#ff0000",
             type: String
         }
     },
     created() {
-        document.addEventListener('click', () => {
+        document.addEventListener("click", () => {
             if (!this.editing && !this.isDragging) {
                 this.showPicker = false;
             }
             this.isDragging = false;
-        })
+        });
         this.color = ColorFactory.create(this.startColor);
     },
     methods: {
@@ -42,7 +42,7 @@ export default {
         },
         setColor(hex, color) {
             this.color = color;
-            this.$emit('color-selected', this.color);
+            this.$emit("color-selected", this.color);
         },
         close() {
             if (!this.edited) {
@@ -78,14 +78,14 @@ export default {
     data() {
         return {
             color: null,
-            sliderColor: '#0ABAB5',
+            sliderColor: "#0ABAB5",
             isDragging: false,
             showPicker: false,
             editing: false,
             edited: false
-        }
+        };
     }
-}
+};
 </script>
 
 <style>

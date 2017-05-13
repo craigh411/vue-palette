@@ -1,4 +1,4 @@
-import Vue from 'vue';
+import Vue from "vue";
 
 var store = new Vue({
     methods: {
@@ -6,18 +6,15 @@ var store = new Vue({
             this.slider = color;
         },
         updateDragging(isDragging) {
-           this.dragging = isDragging;
-        },
-        updateColor(color){
-
+            this.dragging = isDragging;
         }
     },
     data() {
         return {
-            slider: '#ffffff',
+            slider: "#ffffff",
             dragging: false,
-            color: '#ffffff'
-        }
+            color: "#ffffff"
+        };
     }
 });
 

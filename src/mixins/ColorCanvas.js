@@ -1,5 +1,5 @@
-import ColorFactory from '../classes/ColorFactory';
-import Color from '../classes/Color';
+import ColorFactory from "../classes/ColorFactory";
+import Color from "../classes/Color";
 
 export default {
     props: {
@@ -8,9 +8,9 @@ export default {
             type: String
         }
     },
-    inject: ['store', 'bus'],
+    inject: ["store", "bus"],
     created() {
-        document.addEventListener('mouseup', () => {
+        document.addEventListener("mouseup", () => {
             this.dragging = false;
         });
 
@@ -29,7 +29,7 @@ export default {
     },
     methods: {
         getColorAt(x, y) {
-            let imageData = this.ctx.getImageData(x, y, 1, 1).data;
+            const imageData = this.ctx.getImageData(x, y, 1, 1).data;
             return [imageData[0], imageData[1], imageData[2]];
             // return 'rgba(' + imageData[0] + ',' + imageData[1] + ',' + imageData[2] + ',1)';
         },
@@ -39,13 +39,13 @@ export default {
                 y: 0
             };
             let min = null;
-            let lab = Color.upLab(this.rgbValues);
+            const lab = Color.upLab(this.rgbValues);
 
             for (let i = fromX; i <= toX; i++) {
                 for (let j = fromY; j <= toY; j++) {
-                    let data = this.ctx.getImageData(i, j, 1, 1).data;
-                    let compColor = Color.upLab(data);
-                    let diff = Color.compare(lab, compColor);
+                    const data = this.ctx.getImageData(i, j, 1, 1).data;
+                    const compColor = Color.upLab(data);
+                    const diff = Color.compare(lab, compColor);
 
                     if (diff < min || !min) {
                         min = diff;
@@ -70,10 +70,10 @@ export default {
     },
     data() {
         return {
-            color: '',
+            color: "",
             ctx: null,
             dragging: false,
             boundingBox: null
-        }
+        };
     }
-}
+};

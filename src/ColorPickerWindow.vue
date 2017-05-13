@@ -4,11 +4,11 @@
 
             <div class="picker">
 
-                    <color-selector :spectrum="slider" :select-color="select" @color-selected="setColor"></color-selector>
-                    <color-slider @loaded="setSliderColors"></color-slider>
+                <color-selector :spectrum="slider" :select-color="select" @color-selected="setColor"></color-selector>
+                <color-slider @loaded="setSliderColors"></color-slider>
 
                 <div class="hex">
-                    <input :class="{error : hexError}" @blur="updateColor($event.target.value)" :value="hex" placeholder="Hex" @paste="updateColor($event.target.value)" ref="hex" @select="allowSelect"/>
+                    <input :class="{error : hexError}" @blur="updateColor($event.target.value)" :value="hex" placeholder="Hex" @paste="updateColor($event.target.value)" ref="hex" @select="allowSelect" />
                 </div>
                 <div class="rgb">
                     <div class="item">
@@ -27,11 +27,11 @@
 </template>
 
 <script type="text/javascript">
-import ColorSlider from './ColorSlider.vue';
-import ColorSelector from './ColorSelector.vue';
-import Color from './classes/Color';
-import ColorFactory from './classes/ColorFactory'
-import Vue from 'vue';
+import ColorSlider from "./ColorSlider.vue";
+import ColorSelector from "./ColorSelector.vue";
+import Color from "./classes/Color";
+import ColorFactory from "./classes/ColorFactory";
+import Vue from "vue";
 const bus = new Vue({});
 export default {
     components: {
@@ -39,9 +39,9 @@ export default {
         ColorSelector
     },
     provide: {
-        'bus': bus
+        "bus": bus
     },
-    inject: ['store'],
+    inject: ["store"],
     props: {
         selectColor: {
             default: "#ddedee",
@@ -85,8 +85,8 @@ export default {
         setSliderColors(colors) {
             this.sliderColors = colors;
         },
-        allowSelect(){
-         return false;
+        allowSelect() {
+            return false;
         },
         updateColor(hex) {
             if (Color.isHex(hex) && hex !== this.hex) {
@@ -95,7 +95,7 @@ export default {
                 let sliderColor = Object.assign(color, {
                     s: 100,
                     v: 100
-                })
+                });
                 sliderColor = Color.HSVtoRGB(sliderColor);
                 sliderColor = ColorFactory.create(sliderColor);
                 this.store.updateSlider(sliderColor.hex());
@@ -108,19 +108,19 @@ export default {
         },
         setColor(color, hex) {
             this.color = color;
-            this.$emit('color-selected', this.hex, color);
+            this.$emit("color-selected", this.hex, color);
         },
         setRGB(index, value) {
-            let rgb = this.rgbVals;
+            const rgb = this.rgbVals;
             rgb[index] = Math.max(0, Math.min(255, parseInt(value)));
-            let hex = Color.RgbToHex(rgb);
+            const hex = Color.RgbToHex(rgb);
             this.updateColor(hex);
         }
     },
     watch: {
         show(show) {
             if (show) {
-                bus.$emit('reflow');
+                bus.$emit("reflow");
             }
         }
     },
@@ -130,16 +130,15 @@ export default {
             color: null,
             select: null,
             hexError: false
-        }
+        };
     }
-}
+};
 </script>
 
 <style scoped>
-
 .picker-container {
     position: absolute;
-    z-index:999;
+    z-index: 999;
 }
 
 .selection-area {

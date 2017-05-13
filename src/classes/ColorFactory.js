@@ -1,4 +1,4 @@
-import Color from './Color.js';
+import Color from "./Color.js";
 
 class ColorFactory {
     /**
@@ -6,15 +6,14 @@ class ColorFactory {
      */
     static create(color) {
         var format = Color.detectFormat(color);
+
         switch (format) {
-            case 'hex':
+            case "hex":
                 return new Color(Color.normaliseHex(color));
-                break;
-            case 'rgb':
+            case "rgb":
                 return new Color(Color.RgbToHex(color));
-                break;
             default:
-                throw new Error('Unknown color format');
+                throw new Error("Unknown color format");
         }
     }
 }
