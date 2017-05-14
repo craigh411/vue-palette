@@ -65,7 +65,7 @@ export default {
             return (this.color) ? this.color.hex() : "";
         },
         rgb() {
-            return (this.color) ? this.color.rgb() : "";
+            return (this.color) ? this.color.rgbString() : "";
         },
         rgbVals() {
             return (this.color) ? this.color.rgbArray() : [0, 0, 0];

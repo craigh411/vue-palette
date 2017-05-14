@@ -24,7 +24,7 @@ export default {
             return this.color.rgbArray();
         },
         rgb() {
-            return this.color.rgb();
+            return this.color.rgbString();
         }
     },
     methods: {
