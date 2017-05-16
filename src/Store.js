@@ -12,8 +12,7 @@ var store = new Vue({
     data() {
         return {
             slider: "#ffffff",
-            dragging: false,
-            color: "#ffffff"
+            dragging: false
         };
     }
 });

@@ -65,13 +65,13 @@ export default {
             return (this.color) ? this.color.hex() : "";
         },
         rgb() {
-            return (this.color) ? this.color.rgbString() : "";
+            return (this.color) ? this.color.rgb() : "";
         },
         rgbVals() {
-            return (this.color) ? this.color.rgbArray() : [0, 0, 0];
+            return (this.rgb) ? this.rgb.getRgbValues() : [0, 0, 0];
         },
         hsv() {
-            return (this.color) ? this.color.hsv() : {
+            return (this.color) ? this.color.hsv().getHsv() : {
                 h: 1,
                 s: 1,
                 v: 1
@@ -91,14 +91,16 @@ export default {
         updateColor(hex) {
             if (Color.isHex(hex) && hex !== this.hex) {
                 let color = ColorFactory.create(hex);
-                color = color.hsv();
+                color = color.hsv().getHsv();
                 let sliderColor = Object.assign(color, {
                     s: 100,
                     v: 100
                 });
+                console.log(sliderColor);
                 sliderColor = Color.HSVtoRGB(sliderColor);
                 sliderColor = ColorFactory.create(sliderColor);
                 this.store.updateSlider(sliderColor.hex());
+
                 this.select = null;
                 this.$nextTick(() => {
                     this.select = Color.normaliseHex(hex);

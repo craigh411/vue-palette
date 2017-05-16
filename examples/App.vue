@@ -4,7 +4,7 @@
 
         <div class="block" :style="{background: hex}">{{hex}}</div>
         <div class="colors">
-            <div>rgb: {{rgb}}</div>
+            <div>rgb: {{rgbString}}</div>
             <div>rgb values: {{rgbVals}}</div>
             <div>HSV: {{hsv}}</div>
             <div>HSL: {{hsl}}</div>
@@ -58,10 +58,13 @@ export default {
             return (this.color) ? this.color.hex() : "#ff0000";
         },
         rgb() {
-            return (this.color) ? this.color.rgbString() : "";
+            return (this.color) ? this.color.rgb() : "";
+        },
+        rgbString() {
+            return (this.rgb) ? this.rgb.toString() : "";
         },
         rgbVals() {
-            return (this.color) ? this.color.rgbArray() : [0, 0, 0];
+            return (this.rgb) ? this.rgb.getRgbValues() : [0, 0, 0];
         },
         hsv() {
             return (this.color) ? this.color.hsv() : {

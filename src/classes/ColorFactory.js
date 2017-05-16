@@ -6,7 +6,6 @@ class ColorFactory {
      */
     static create(color) {
         var format = Color.detectFormat(color);
-
         switch (format) {
             case "hex":
                 return new Color(Color.normaliseHex(color));

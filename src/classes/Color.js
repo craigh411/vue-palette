@@ -1,15 +1,14 @@
 import DeltaE from "delta-e";
+import Rgb from "./Rgb";
+import Hsv from "./Hsv";
+import Hsl from "./Hsl";
+import ColorFactory from "./ColorFactory";
 
 class Color {
     constructor(hex) {
         if (Color.isHex(hex)) {
             this.hexVal = hex;
-            this.rgbVal = Color.hexToRgb(this.hexVal);
-            this.rgbVals = Color.getRGBVals(this.rgbVal);
-            this.hsvVal = Color.rgbToHsv(this.rgbVals);
-            this.upLabVal = Color.upLab(this.rgbVals);
-            this.xyzVal = Color.xyz(this.rgbVals);
-            this.hslVal = Color.rgbToHsl(this.rgbVals);
+            this.rgbObj = new Rgb(Color.hexToRgb(this.hexVal));
         } else {
             throw new Error("Color should be in Hexidecimal format. Try using ColorFactory.create() instead.");
         }
@@ -19,36 +18,27 @@ class Color {
         return this.hexVal;
     }
 
-    rgbString() {
-        return this.rgbVal;
-    }
-
-    rgbArray() {
-        return this.rgbVals;
-    }
-
     rgb() {
-        return { r: this.rgbVals[0], g: this.rgbVals[1], b: this.rgbVals[2] };
+        return this.rgbObj;
     }
 
     hsv() {
-        return this.hsvVal;
+        return new Hsv(Color.rgbToHsv(this.rgb().getRgbValues()));
     }
 
     upLab() {
-        return this.upLabVal;
+        return  Color.upLab(this.rgb().getRgbValues());
     }
 
     xyz() {
-        return this.xyzVal;
+        return Color.xyz(this.rgb().getRgbValues());
     }
 
     hsl() {
-        return this.hslVal;
+        return new Hsl(Color.rgbToHsl(this.rgb().getRgbValues()));
     }
 
     static xyz(rgb) {
-        // let rgb = this.rgbVals;
 
         let R = (rgb[0] / 255);
         let G = (rgb[1] / 255);
@@ -70,7 +60,7 @@ class Color {
     }
 
     static upLab(rgb) {
-        // Universal perceptual Lab, converted from
+        // Universal perceptual Lab
         // http://www.brucelindbloom.com
         const { X, Y, Z } = Color.xyz(rgb);
         const Xr = 0.964221; // reference white D50
@@ -88,6 +78,7 @@ class Color {
         const fy = (yr > eps) ? Math.pow(yr, 1 / 3) : ((k * yr + 16) / 116);
         const fz = (zr > eps) ? Math.pow(zr, 1 / 3) : ((k * zr + 16) / 116);
 
+
         const Ls = (116 * fy) - 16;
         const as = 500 * (fx - fy);
         const bs = 200 * (fy - fz);
@@ -100,13 +91,6 @@ class Color {
         return { L: lab[0], A: lab[1], B: lab[2] };
     }
 
-    static getClosestMatch(color, matchList, method = "lab") {
-        if (method === "lab") {
-            // Use Universal perceptual Lab
-        } else {
-            // Use HSV
-        }
-    }
 
     static compare(color1, color2, formula) {
         if (formula === "E76") {
@@ -119,18 +103,23 @@ class Color {
     }
 
     /**
+     *
+     */
+    brightness() {
+        var rgb = this.rgbObj.getRgbValues();
+        return 0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2];
+    }
+
+    /**
      * Returns the distance between two colors. If calling multiple times it will be faster to use the static compare method.
      * @param Color color - The color to compare to.
      * @param String forumla - the DeltaE formula (either "E76", "E94") defaults to E00.
      */
     compareTo(color, formula) {
-        return Color.compare(Color.upLab(this.color.rgbVals), Color.upLab(color.rgbVals), formula);
+        return Color.compare(Color.upLab(this.rgb().getRgbValues()), Color.upLab(color.rgb().getRgbValues()), formula);
     }
 
-    brightness() {
-        const rgb = this.rgbVals;
-        return 0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2]; // per ITU-R BT.709
-    }
+
 
     static lighten(rgb, amount) {
         let [R, G, B] = rgb;
@@ -142,9 +131,6 @@ class Color {
         return [R, G, B];
     }
 
-    format() {
-        return Color.detectFormat();
-    }
 
     /**
      * Static methods required for factory function
@@ -154,11 +140,15 @@ class Color {
     }
 
     static hexToRgb(hex) {
+        /* istanbul ignore else */
         if (Color.isHex(hex)) {
             let color = hex.substring(1).split("");
             color = (color.length === 3) ? [color[0], color[0], color[1], color[1], color[2], color[2]] : color;
             color = "0x" + color.join("");
-            return "rgba(" + [(color >> 16) & 255, (color >> 8) & 255, color & 255].join(",") + ",1)";
+            const r = (color >> 16) & 255;
+            const g = (color >> 8) & 255;
+            const b = color & 255;
+            return { r: r, g: g, b: b }
         }
         throw new Error("Invalid Hex Value");
     }

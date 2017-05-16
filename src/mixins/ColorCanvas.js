@@ -20,11 +20,11 @@ export default {
         hex() {
             return this.color.hex();
         },
-        rgbValues() {
-            return this.color.rgbArray();
-        },
         rgb() {
-            return this.color.rgbString();
+            return this.color.rgb();
+        },
+        rgbValues() {
+            return (this.rgb) ? this.rgb.getRgbValues() : [0,0,0];
         }
     },
     methods: {
